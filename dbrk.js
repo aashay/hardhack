@@ -88,3 +88,12 @@ bart.on('dbrk south', function(estimates){
     writeBottomLine(line2);
 
 });
+
+bart.on('error', function(err){
+   clearScreen();
+   writeTopLine("No train data");
+   console.log("Got an error, probably no more train data");
+   process.exit();
+});
+
+console.log("Running BART thing...");
