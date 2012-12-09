@@ -42,7 +42,7 @@ function writeBottomLine(line){
 }
 
 clearScreen();
-bart.on('dbrk south', function(estimates){
+bart.on('powl south', function(estimates){
     
     //Sort by minutes
     estimates = sortByKey(estimates, "minutes");
@@ -63,6 +63,10 @@ bart.on('dbrk south', function(estimates){
            + (estimates[1].minutes > 1 ? " minutes." : " minute.");
     }
 
+    //Pronounce things properly!
+    status1 = status1.replace(/SFO/ig, "S.F.O");
+    status2 = status2.replace(/SFO/ig, "S.F.O");
+
     //Spit out the status lines to the console
     console.log(status1);
     console.log(status2);
@@ -79,10 +83,10 @@ bart.on('dbrk south', function(estimates){
         });
     });
 
-    //Write to LCD
+    //Write to LCD, substring 0,12 to keep enough room
     clearScreen();
-    var line1 = estimates[0].destination + " " + (estimates[0].minutes || "BRD");
-    var line2 = estimates[1].destination + " " + (estimates[1].minutes || "BRD"); //BRD for "boarding" to keep it short
+    var line1 = estimates[0].destination.substring(0,12) + " " + (estimates[0].minutes || "BRD");
+    var line2 = estimates[1].destination.substring(0,12) + " " + (estimates[1].minutes || "BRD"); //BRD for "boarding" to keep it short
 
     writeTopLine(line1);
     writeBottomLine(line2);

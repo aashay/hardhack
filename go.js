@@ -1,8 +1,8 @@
 var bart = require('bart').createClient();
 var flite = require('flite')
 
-var SerialPort = require("serialport").SerialPort
-var serialPort = new SerialPort("/dev/ttyUSB0");
+var serlcd = require('serlcd');
+var lcd = new serlcd();
 
 function sortByKey(array, key) {
     return array.sort(function(a, b) {
@@ -11,37 +11,7 @@ function sortByKey(array, key) {
     });
 }
 
-function clearScreen(){
-    var b = new Buffer([0xFE, 0x01]);
-    serialPort.write(b);
-}
-
-function clearAndWrite(msg){
-    clearScreen();
-    setTimeout(function(){
-        serialPort.write(msg);
-    }, 50);
-}
-
-function writeTopLine(line){
-    line = line.substring(0,16);  //Truncate
-
-    setTimeout(function(){
-        serialPort.write(new Buffer([0xFE, 0x80])); //0x80 sets cursor to first position of first line
-        serialPort.write(line);
-    }, 100); //If you write it too fast it won't write!
-}
-
-function writeBottomLine(line){
-    line = line.substring(0,16);  //Truncate
-
-    setTimeout(function(){
-        serialPort.write(new Buffer([0xFE, 0xC0])); //0xC0 sets cursor to first position of second line
-        serialPort.write(line);
-    }, 120);
-}
-
-clearScreen();
+lcd.clearScreen();
 bart.on('powl south', function(estimates){
     
     //Sort by minutes
@@ -63,6 +33,10 @@ bart.on('powl south', function(estimates){
            + (estimates[1].minutes > 1 ? " minutes." : " minute.");
     }
 
+    //Pronounce things properly!
+    status1 = status1.replace(/SFO/ig, "S.F.O");
+    status2 = status2.replace(/SFO/ig, "S.F.O");
+
     //Spit out the status lines to the console
     console.log(status1);
     console.log(status2);
@@ -79,19 +53,19 @@ bart.on('powl south', function(estimates){
         });
     });
 
-    //Write to LCD
-    clearScreen();
-    var line1 = estimates[0].destination + " " + (estimates[0].minutes || "BRD");
-    var line2 = estimates[1].destination + " " + (estimates[1].minutes || "BRD"); //BRD for "boarding" to keep it short
+    //Write to LCD, substring 0,12 to keep enough room
+    lcd.clearScreen();
+    var line1 = estimates[0].destination.substring(0,12) + " " + (estimates[0].minutes || "BRD");
+    var line2 = estimates[1].destination.substring(0,12) + " " + (estimates[1].minutes || "BRD"); //BRD for "boarding" to keep it short
 
-    writeTopLine(line1);
-    writeBottomLine(line2);
+    lcd.writeTopLine(line1);
+    lcd.writeBottomLine(line2);
 
 });
 
 bart.on('error', function(err){
-   clearScreen();
-   writeTopLine("No train data");
+   lcd.clearScreen();
+   lcd.writeTopLine("No train data");
    console.log("Got an error, probably no more train data");
    process.exit();
 });
