@@ -8,7 +8,7 @@ var flite = require('flite')
 var serlcd = require('serlcd');
 var lcd = new serlcd();
 
-var STATION_STRING = "powl north";
+var STATION_STRING = "dbrk south";
 
 
 function sortByKey(array, key) {
@@ -24,7 +24,7 @@ var handleEstimates = function(estimates){
     estimates = sortByKey(estimates, "minutes");
     
     var status1;
-    if(estimates[0].minutes <= 0){
+    if(estimates[0] && estimates[0].minutes <= 0){
        status1 = estimates[0].length + " car " + estimates[0].destination + " train now boarding platform " + estimates[0].platform;
     }else{
        status1 = estimates[0].length + " car " + estimates[0].destination + " train in " + estimates[0].minutes
@@ -32,7 +32,7 @@ var handleEstimates = function(estimates){
     }
 
     var status2;
-    if(estimates[1].minutes <= 0){
+    if(estimates[1] && estimates[1].minutes <= 0){
        status2 = estimates[1].length + " car " + estimates[1].destination + " train now boarding platform " + estimates[1].platform;
     }else{
        status2 = estimates[1].length + " car " + estimates[1].destination + " train in " + estimates[1].minutes
@@ -48,6 +48,7 @@ var handleEstimates = function(estimates){
     console.log(status2);
     console.log();
 
+    //Say stuff
     flite({voice: 'slt'},function (err, speech) {
        speech.say(status1, function (err) {
            if (err) console.error(err);
@@ -74,10 +75,6 @@ bart.on(STATION_STRING, handleEstimates);
 
 app.get('/', function(req, res){
   res.send('BART thing listening to ' + STATION_STRING);
-});
-
-app.get('/station', function(req,res){    
-    
 });
 
 app.get('/station/:stationstring', function(req,res){        
