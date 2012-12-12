@@ -44,9 +44,9 @@ var handleEstimates = function(estimates){
     status2 = status2.replace(/SFO/ig, "S.F.O").replace(/\//ig," ");
 
     //Spit out the status lines to the console
-    console.log(status1);
-    console.log(status2);
-    console.log();
+    //console.log(status1);
+    //console.log(status2);
+    //console.log();
 
     //Say stuff
     flite({voice: 'slt'},function (err, speech) {
